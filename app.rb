@@ -62,7 +62,7 @@ class User
     tumblr  = tumblr_client()
 
     oembed = twitter.oembed(id)
-    tumblr.text('subetter.tumblr.com', :body => oembed.html)
+    tumblr.text('subetter.tumblr.com', :body => oembed.html, :slug => id)
   end
 
   def twitter_client
