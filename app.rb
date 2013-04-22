@@ -18,6 +18,8 @@ TWITTER_CONSUMER_SECRET_KEY = ENV["TWITTER_CONSUMER_SECRET_KEY"]
 
 TUMBLR_CONSUMER_KEY         = ENV["TUMBLR_CONSUMER_KEY"]
 TUMBLR_CONSUMER_SECRET_KEY  = ENV["TUMBLR_CONSUMER_SECRET_KEY"]
+TUMBLR_OAUTH_TOKEN          = ENV["TUMBLR_OAUTH_TOKEN"]
+TUMBLR_OAUTH_TOKEN_SECRET   = ENV["TUMBLR_OAUTH_TOKEN_SECRET"]
 
 use OmniAuth::Builder do
   provider :tumblr,  TUMBLR_CONSUMER_KEY,  TUMBLR_CONSUMER_SECRET_KEY
@@ -30,31 +32,22 @@ Twitter.configure do |config|
 end
 
 Tumblife.configure do |config|
-  config.consumer_key    = TUMBLR_CONSUMER_KEY
-  config.consumer_secret = TUMBLR_CONSUMER_SECRET_KEY
+  config.consumer_key       = TUMBLR_CONSUMER_KEY
+  config.consumer_secret    = TUMBLR_CONSUMER_SECRET_KEY
+  config.oauth_token        = TUMBLR_OAUTH_TOKEN
+  config.oauth_token_secret = TUMBLR_OAUTH_TOKEN_SECRET
 end
 
 class User
-  attr_reader :twtter_access_token,
-    :twitter_access_token_secret,
-    :tumblr_access_token,
-    :tumblr_access_token_secret,
-    :tumblr_subetter
+  attr_reader :twtter_access_token, :twitter_access_token_secret
 
   def initialize(session)
     @twitter_access_token        = session['twitter_access_token']
     @twitter_access_token_secret = session['twitter_access_token_secret']
-    @tumblr_access_token         = session['tumblr_access_token']
-    @tumblr_access_token_secret  = session['tumblr_access_token_secret']
-    @tumblr_subetter             = session['tumblr_subetter']
   end
 
   def twitter_login?
     @twitter_access_token && @twitter_access_token_secret
-  end
-
-  def tumblr_login?
-    @tumblr_access_token && @tumblr_access_token_secret
   end
 
   def post(id)
@@ -73,10 +66,7 @@ class User
   end
 
   def tumblr_client
-    Tumblife.client(
-      :oauth_token        => @tumblr_access_token,
-      :oauth_token_secret => @tumblr_access_token_secret
-    )
+    Tumblife.client
   end
 end
 
@@ -107,22 +97,15 @@ get '/auth/:name/callback' do
   session[ @auth['provider'] + '_access_token'] = @auth['credentials']['token']
   session[ @auth['provider'] + '_access_token_secret'] = @auth['credentials']['secret']
 
-  if @auth['provider'] == "tumblr" then
-    session['tumblr_subetter'] =
-      @auth['extra']["raw_info"]["blogs"].select { |b| b.url == "http://subetter.tumblr.com" } ? 1 : 0
-  end
-
   redirect '/'
 end
 
 get '/logout' do
 
-  ["twitter", "tumblr"].each do |name|
+  ["twitter"].each do |name|
     session[ name + '_access_token']        = nil
     session[ name + '_access_token_secret'] = nil
   end
-
-  session['tumblr_subetter'] = nil
 
   redirect '/'
 end
@@ -144,9 +127,6 @@ __END__
 <% @messages.each do |msg| %>
 <div><%= msg %></div>
 <% end %>
-<% unless @user.tumblr_login? then %>
-<a href="/auth/tumblr">login tumblr</a>
-<% end %>
 </div>
 <div>
 <% unless @user.twitter_login? then %>
@@ -154,13 +134,11 @@ __END__
 <% end %>
 </div>
 <div>
-<% if @user.tumblr_login? and @user.twitter_login? then %>
+<% if @user.twitter_login? then %>
 <form method="post" action="/post">
 <input type="text" name="id" />
 <input type="submit" value="post" />
 </form>
-<% end %>
-<% if @user.tumblr_login? or @user.twitter_login? then %>
 <a href="/logout">logout</a>
 <% end %>
 </div>
