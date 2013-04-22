@@ -1,8 +1,13 @@
+GIT
+  remote: git://github.com/mperham/dalli.git
+  revision: 0f07d6361ae0e18493e7e41daa23427cf3e0960a
+  specs:
+    dalli (2.6.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
     backports (3.3.0)
-    dalli (2.6.2)
     faraday (0.8.7)
       multipart-post (~> 1.1)
     faraday_middleware (0.9.0)
@@ -63,7 +68,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  dalli
+  dalli!
   memcachier
   omniauth
   omniauth-tumblr

@@ -10,5 +10,5 @@ gem 'omniauth-tumblr'
 gem 'omniauth-twitter'
 gem 'twitter'
 gem 'tumblife'
-gem 'dalli'
+gem 'dalli', :git => "git://github.com/mperham/dalli.git"
 gem 'memcachier'
