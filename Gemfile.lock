@@ -4,6 +4,15 @@ GIT
   specs:
     dalli (2.6.2)
 
+GIT
+  remote: git://github.com/sferik/twitter.git
+  revision: c890e7d288e3997c3a539a21bd34e8cae360ba9e
+  specs:
+    twitter (4.6.2)
+      faraday (~> 0.8, < 0.10)
+      multi_json (~> 1.0)
+      simple_oauth (~> 0.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -59,10 +68,6 @@ GEM
       hashie (~> 1.2.0)
       multi_json (~> 1.5.0)
       simple_oauth (~> 0.2.0)
-    twitter (4.6.2)
-      faraday (~> 0.8, < 0.10)
-      multi_json (~> 1.0)
-      simple_oauth (~> 0.2)
 
 PLATFORMS
   ruby
@@ -78,4 +83,4 @@ DEPENDENCIES
   sinatra-flash
   sinatra-reloader
   tumblife
-  twitter
+  twitter!
