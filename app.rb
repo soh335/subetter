@@ -34,7 +34,7 @@ post '/post' do
     twitter = Twitter::Client.new
     oembed = twitter.oembed(id)
     ret = tumblr.text('subetter.tumblr.com', :body => oembed.html, :slug => id)
-    flash[:msg] = ret["id"] ? "success to post" : "error"
+    flash[:msg] = ret["id"] ? "success to post. <br>check <a href=\"http://subetter.tumblr.com/\">subetter.tumblr.com</a>" : "error"
   rescue Twitter::Error => error
     flash[:msg] = error.to_s
   rescue => error
@@ -64,8 +64,11 @@ __END__
 <% end %>
 </div>
 <div>
++ subetter +<br>
+<br>
 <form method="post" action="/post">
-<input type="text" name="id" />
+tweet_id: <input type="text" name="id" />
 <input type="submit" value="post" />
 </form>
+enjoy.
 </div>
