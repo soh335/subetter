@@ -5,6 +5,7 @@ require 'twitter'
 require 'tumblife'
 require 'pp'
 require 'rack/session/cookie'
+set :erb, :escape_html => true
 
 use Rack::Session::Cookie, :expire_after => 60 * 60 * 24 * 3,
                            :secret       => ENV["SESSION_SECRET"]
@@ -34,7 +35,7 @@ post '/post' do
     twitter = Twitter::Client.new
     oembed = twitter.oembed(id)
     ret = tumblr.text('subetter.tumblr.com', :body => oembed.html, :slug => id)
-    flash[:msg] = ret["id"] ? "success to post. <br>check <a href=\"http://subetter.tumblr.com/\">subetter.tumblr.com</a>" : "error"
+    flash[:msg] = ret["id"] ? (erb :success) : "error"
   rescue Twitter::Error => error
     flash[:msg] = error.to_s
   rescue => error
@@ -72,3 +73,6 @@ tweet_id: <input type="text" name="id" />
 </form>
 enjoy.
 </div>
+
+@@ success
+"success to post. <br>check <a href=\"http://subetter.tumblr.com/\">subetter.tumblr.com</a>"
