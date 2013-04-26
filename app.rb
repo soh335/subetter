@@ -25,6 +25,7 @@ end
 
 get '/' do
   @messages = [flash[:msg]]
+  @is_success = flash[:is_success]
   erb :index
 end
 
@@ -35,7 +36,9 @@ post '/post' do
     twitter = Twitter::Client.new
     oembed = twitter.oembed(id)
     ret = tumblr.text('subetter.tumblr.com', :body => oembed.html, :slug => id)
-    flash[:msg] = ret["id"] ? (erb :success) : "error"
+    if ret["id"]
+      flash[:is_success] = true
+    end
   rescue Twitter::Error => error
     flash[:msg] = error.to_s
   rescue => error
@@ -63,6 +66,9 @@ __END__
 <% @messages.each do |msg| %>
 <div><%= msg %></div>
 <% end %>
+<% if @is_success %>
+success to post. <br>check <a href="http://subetter.tumblr.com/">subetter.tumblr.com</a>
+<% end %>
 </div>
 <div>
 + subetter +<br>
@@ -73,6 +79,3 @@ tweet_id: <input type="text" name="id" />
 </form>
 enjoy.
 </div>
-
-@@ success
-"success to post. <br>check <a href=\"http://subetter.tumblr.com/\">subetter.tumblr.com</a>"
