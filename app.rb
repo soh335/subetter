@@ -23,6 +23,10 @@ Tumblife.configure do |config|
   config.oauth_token_secret = ENV["TUMBLR_OAUTH_TOKEN_SECRET"]
 end
 
+configure :production do
+  require 'newrelic_rpm'
+end
+
 get '/' do
   @messages = [flash[:msg]]
   @is_success = flash[:is_success]
