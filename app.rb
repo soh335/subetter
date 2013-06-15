@@ -2,7 +2,6 @@ require 'sinatra'
 require "sinatra/reloader" if development?
 require 'sinatra/flash'
 require 'twitter'
-require 'tumblife'
 require 'pp'
 require 'rack/session/cookie'
 set :erb, :escape_html => true
@@ -10,17 +9,13 @@ set :erb, :escape_html => true
 use Rack::Session::Cookie, :expire_after => 60 * 60 * 24 * 3,
                            :secret       => ENV["SESSION_SECRET"]
 
-Twitter.configure do |config|
-  config.consumer_key    = ENV["TWITTER_CONSUMER_KEY"]
-  config.consumer_secret = ENV["TWITTER_CONSUMER_SECRET_KEY"]
-  config.bearer_token    = ENV["TWITTER_BEARER_TOKEN"]
-end
-
-Tumblife.configure do |config|
-  config.consumer_key       = ENV["TUMBLR_CONSUMER_KEY"]
-  config.consumer_secret    = ENV["TUMBLR_CONSUMER_SECRET_KEY"]
-  config.oauth_token        = ENV["TUMBLR_OAUTH_TOKEN"]
-  config.oauth_token_secret = ENV["TUMBLR_OAUTH_TOKEN_SECRET"]
+configure do
+  RETWEET_CLIENT = Twitter::Client.new(
+    consumer_key:       ENV["TWITTER_CONSUMER_KEY"],
+    consumer_secret:    ENV["TWITTER_CONSUMER_SECRET_KEY"],
+    oauth_token:        ENV["TWITTER_ACCESS_TOKEN"],
+    oauth_token_secret: ENV["TWITTER_ACCESS_TOKEN_SECRET"]
+  )
 end
 
 configure :production do
@@ -36,11 +31,8 @@ end
 post '/post' do
   begin
     id = request.params["id"]
-    tumblr = Tumblife.client
-    twitter = Twitter::Client.new
-    oembed = twitter.oembed(id)
-    ret = tumblr.text('subetter.tumblr.com', :body => oembed.html, :slug => id)
-    if ret["id"]
+    tweet = RETWEET_CLIENT.retweet(id.to_i)
+    if tweet
       flash[:is_success] = true
     end
   rescue Twitter::Error => error
@@ -71,7 +63,7 @@ __END__
 <div><%= msg %></div>
 <% end %>
 <% if @is_success %>
-success to post. <br>check <a href="http://subetter.tumblr.com/">subetter.tumblr.com</a>
+success to post. <br>check <a href="https://twitter.com/subetter_san">subetter_san</a>
 <% end %>
 </div>
 <div>
